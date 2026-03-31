@@ -1,12 +1,13 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
-# .
 name: Build and deploy Node.js app to Azure Web App - app-backend-group2
+
 on:
   push:
     branches:
       - main
   workflow_dispatch:
+
 jobs:
   build:
     runs-on: self-hosted
@@ -51,10 +52,13 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_CA1B97D8A50A4B339A846930E38CBBAE }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_DA939BF546A846DA87238FA577A05C99 }}
 
-      - name: Deploy to Azure Web App
-        id: deploy-to-webapp
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: 'app-backend-group2'
-          slot-name: 'Production'
-          package: .
+      - name: Zip the app
+        run: zip -r app.zip .
+
+      - name: Deploy via Azure CLI
+        run: |
+          az webapp deploy \
+            --resource-group rg-3tier-group-2 \
+            --name app-backend-group2 \
+            --src-path app.zip \
+            --type zip
